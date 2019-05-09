@@ -38,7 +38,57 @@ public class PhysicsExperiment {
     int[][] scheduleTable = new int[numStudents + 1][numSteps + 1];
 
     // Your code goes here
+    int student = 1; //index of student in signupTable
+    int col = 1; //index of the current step
 
+    int leftSteps = numSteps;
+
+    while(leftSteps > 0)
+    {
+      if(signUpTable[student][col] == 0) //if student doesn't want to sign in to the current step
+      {
+        if(col != numSteps)
+        {
+          int consecutive = 0;
+          int indexofStudent = 1;
+
+          for(int i = 1; i <= numStudents; i++) //finding student who does the most consecutive steps.
+          {
+            int currentNumConsecutive=0;
+            for(int j = col; j <= numSteps; j++)
+            {
+              if(signUpTable[i][j] == 0)
+              {
+                break;
+              }
+              else
+              {
+                currentNumConsecutive++;
+              }
+              if(currentNumConsecutive > consecutive)
+              {
+                consecutive = currentNumConsecutive;
+                indexofStudent = i;
+              }
+            }
+          }
+          student = indexofStudent;
+        }
+        else
+        {
+          if(student == numStudents)
+            student = 1;
+          else
+            student++;
+        }
+      }
+      else //if student wants to sign in to the current step
+      {
+        scheduleTable[student][col] = 1;
+        col++;
+        leftSteps--;
+      }
+    }
     return scheduleTable;
   }
 
