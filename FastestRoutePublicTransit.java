@@ -1,7 +1,7 @@
 /**
  * Public Transit
- * Author: Your Name and Carolyn Yao
- * Does this compile? Y/N
+ * Author: Taeyong Lee and Carolyn Yao
+ * Does this compile? Y
  */
 
 /**
@@ -34,9 +34,52 @@ public class FastestRoutePublicTransit {
   ) {
     // Your code along with comments here. Feel free to borrow code from any
     // of the existing method. You can also make new helper methods.
-    return 0;
-  }
+    int numVertices = lengths[0].length;
 
+    int[] times = new int[numVertices];//Array for storing all shortest times
+
+    Boolean[] processed = new Boolean[numVertices]; //processed[i] will be true if it we get the final shortest path.
+
+    for (int i = 0; i < numVertices; i++) //before start, set the all processed as false and all shortest times as maximum
+    {
+      times[i] = Integer.MAX_VALUE;
+      processed[i] = false;
+    }
+
+    times[S] = startTime;//start time is current time
+
+    int temp; //times from last train
+
+    for(int i = 0; i < numVertices - 1; i++)// finding shortest path to all vertices
+    {
+      int u = findNextToProcess(times, processed);
+      processed[u] = true;
+
+      for(int v = 0; v < numVertices; v++)
+      {
+        if(first[u][v] < times[u])//calculating wait time if first time is less than current time
+        {
+          if(freq[u][v] == 0)
+            temp = times[u] + lengths[u][v];
+          else
+          {
+            temp = ((times[u] - first[u][v]) % freq[u][v]);
+
+            if(temp == 0) //train arrived when temp = 0
+              temp = lengths[u][v] + times[u];
+            else //time for next train
+              temp = times[u] + lengths[u][v] + freq[u][v] - temp;
+          }
+        }
+        else
+          temp =times[u] + lengths[u][v] + (first[u][v] - times[u]);
+
+        if (!processed[v] && times[u] != Integer.MAX_VALUE && lengths[u][v]!=0 && temp < times[v])
+          times[v] = temp;
+      }
+    }
+    return times[T] - startTime;
+  }
   /**
    * Finds the vertex with the minimum time from the source that has not been
    * processed yet.
@@ -125,5 +168,47 @@ public class FastestRoutePublicTransit {
     t.shortestTime(lengthTimeGraph, 0);
 
     // You can create a test case for your implemented method for extra credit below
+    int first[][]=new int[][]
+            {
+                    {0, 14, 0, 0, 0, 0, 0, 8, 0},
+                    {7, 0, 16, 0, 4, 0, 0, 11, 0},
+                    {0, 11, 0, 7, 0, 4, 0, 0, 2},
+                    {0, 0, 7, 0, 9, 14, 0, 0, 0},
+                    {0, 0, 0, 9, 0, 10, 0, 0, 0},
+                    {0, 0, 4, 14, 10, 0, 2, 0, 0},
+                    {0, 0, 0, 0, 0, 2, 0, 1, 6},
+                    {8, 11, 0, 0, 0, 0, 1, 0, 7},
+                    {0, 0, 2, 0, 0, 0, 6, 7, 0}
+            };
+
+    int freq[][]= new int[][]
+            {
+                    {0, 4, 0, 0, 0, 0, 0, 8, 0},
+                    {4, 0, 8, 0, 0, 0, 0, 11, 0},
+                    {0, 8, 0, 7, 0, 4, 0, 0, 2},
+                    {0, 0, 7, 0, 9, 14, 0, 0, 0},
+                    {0, 0, 0, 9, 0, 10, 0, 0, 0},
+                    {0, 0, 6, 9, 6, 0, 14, 0, 0},
+                    {0, 0, 0, 0, 0, 3, 0, 2, 2},
+                    {3, 11, 0, 0, 0, 0, 5, 0, 2},
+                    {0, 0, 4, 0, 0, 0, 1, 12, 0}
+            };
+
+    int length[][] = new int[][]
+            {
+                    {0, 11, 0, 0, 0, 0, 0, 20, 0},
+                    {8, 0, 16, 0, 0, 0, 0, 18, 0},
+                    {0, 7, 0, 13, 0, 16, 0, 0, 8},
+                    {0, 0, 5, 0, 5, 15, 0, 0, 0},
+                    {0, 0, 0, 9, 0, 10, 0, 0, 0},
+                    {0, 0, 4, 14, 10, 0, 2, 0, 0},
+                    {0, 0, 0, 0, 0, 2, 0, 1, 6},
+                    {8, 11, 0, 0, 0, 0, 2, 0, 7},
+                    {10, 0, 2, 0, 0, 0, 6, 12, 0}
+            };
+
+
+    FastestRoutePublicTransit testing = new FastestRoutePublicTransit();
+    System.out.println("Shortest time from 0 to 5 at Starting time 20 is: " + testing.myShortestTravelTime(0, 5, 20, length, first, freq) + " minutes");//answer should be 32 min
   }
 }
